@@ -20,3 +20,4 @@ Thumbs.db
 
 # Local configuration
 .env
+config/db.properties
