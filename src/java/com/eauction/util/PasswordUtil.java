@@ -27,8 +27,8 @@ public class PasswordUtil {
         );
 
         try {
-            SecretKeyFactory factory =
-                    SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+            SecretKeyFactory factory
+                    = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
 
             byte[] hash = factory.generateSecret(spec).getEncoded();
 
@@ -42,6 +42,38 @@ public class PasswordUtil {
 
         } finally {
             spec.clearPassword();
+        }
+    }
+
+    public static boolean verify(String value, String storedHash) {
+
+        try {
+            String[] parts = storedHash.split(":");
+
+            int iterations = Integer.parseInt(parts[0]);
+            byte[] salt = Base64.getDecoder().decode(parts[1]);
+            byte[] expectedHash = Base64.getDecoder().decode(parts[2]);
+
+            PBEKeySpec spec = new PBEKeySpec(
+                    value.toCharArray(),
+                    salt,
+                    iterations,
+                    expectedHash.length * 8
+            );
+
+            SecretKeyFactory factory
+                    = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+
+            byte[] actualHash
+                    = factory.generateSecret(spec).getEncoded();
+
+            return java.security.MessageDigest.isEqual(
+                    expectedHash,
+                    actualHash
+            );
+
+        } catch (Exception e) {
+            return false;
         }
     }
 }

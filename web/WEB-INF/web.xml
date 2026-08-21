@@ -9,6 +9,6 @@
         <url-pattern>/SignUpServlet</url-pattern>
     </servlet-mapping>
     <welcome-file-list>
-        <welcome-file>test-signup.html</welcome-file>
+        <welcome-file>login-test.html</welcome-file>
     </welcome-file-list>
 </web-app>
