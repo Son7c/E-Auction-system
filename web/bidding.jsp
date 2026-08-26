@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -153,6 +154,27 @@
 
         .register-btn:hover {
             background: #0d4bc0;
+        }
+
+        .username {
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .logout-btn {
+            padding: 9px 18px;
+            border: 1px solid white;
+            border-radius: 6px;
+            color: white !important;
+            text-decoration: none;
+            font-size: 12px;
+            transition: 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #06152b !important;
         }
 
 
@@ -523,89 +545,8 @@
 
     <!-- ================= NAVIGATION ================= -->
 
-    <nav class="navbar">
+    <jsp:include page="navbar.jsp" />
 
-
-        <div class="logo">
-
-            <div class="logo-icon">
-                ⚒
-            </div>
-
-            <div>
-                E-<span>AUCTION</span>
-            </div>
-
-        </div>
-
-
-        <ul class="nav-links">
-
-
-            <li>
-                <a href="homepage.html">
-                    Home
-                </a>
-            </li>
-
-
-            <li>
-                <a
-                    href="bidding.html"
-                    class="active"
-                >
-                    Auctions
-                </a>
-            </li>
-
-
-            <li>
-                <a href="homepage.html#how-it-works">
-                    How It Works
-                </a>
-            </li>
-
-
-            <li>
-                <a href="homepage.html#about-us">
-                    About Us
-                </a>
-            </li>
-
-
-            <li>
-                <a href="homepage.html#contact">
-                    Contact
-                </a>
-            </li>
-
-
-        </ul>
-
-
-        <div class="nav-buttons">
-
-
-            <a
-                href="login-test.html"
-                class="login-btn"
-            >
-                Login
-            </a>
-
-
-            <a
-                href="test-signup.html"
-                class="register-btn"
-            >
-                Register
-            </a>
-
-
-        </div>
-
-
-    </nav>
 
 
 
@@ -635,7 +576,7 @@
             <!-- OPENS SEPARATE PAGE -->
 
             <a
-                href="create-auction.html"
+                href="create-auction.jsp"
                 class="create-button"
             >
 
@@ -697,7 +638,7 @@
 
 
             <a
-                href="create-auction.html"
+                href="create-auction.jsp"
                 class="create-button"
             >
 

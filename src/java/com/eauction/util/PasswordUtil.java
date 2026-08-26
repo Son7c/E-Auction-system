@@ -14,6 +14,9 @@ public class PasswordUtil {
     private static final int SALT_LENGTH = 16;
 
     public static String hash(String value) {
+        if (value == null) {
+            return null;
+        }
 
         byte[] salt = new byte[SALT_LENGTH];
         SecureRandom random = new SecureRandom();

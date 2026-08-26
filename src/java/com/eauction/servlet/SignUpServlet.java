@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet("/signup")
+@WebServlet({"/signup", "/SignUpServlet"})
 public class SignUpServlet extends HttpServlet {
 
     @Override
@@ -22,8 +22,12 @@ public class SignUpServlet extends HttpServlet {
         // 1. Create UserForm object
         UserForm user = new UserForm();
 
-        // 2. Get data from HTML form
-        user.setName(request.getParameter("name"));
+        // 2. Get data from HTML form (supports both 'name' and 'fullName')
+        String name = request.getParameter("name");
+        if (name == null || name.trim().isEmpty()) {
+            name = request.getParameter("fullName");
+        }
+        user.setName(name);
         user.setEmail(request.getParameter("email"));
         user.setPassword(request.getParameter("password"));
         user.setPhoneNo(request.getParameter("phoneNo"));
@@ -42,11 +46,9 @@ public class SignUpServlet extends HttpServlet {
 
         // 4. Decide what to do after registration
         if (success) {
-    response.setContentType("text/html");
-    response.getWriter().println("<h1>Registration Successful!</h1>");
-} else {
-    response.setContentType("text/html");
-    response.getWriter().println("<h1>Registration Failed!</h1>");
-}
+            response.sendRedirect("login.jsp?registered=true");
+        } else {
+            response.sendRedirect("signup.jsp?error=failed");
+        }
     }
 }

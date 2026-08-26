@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -344,7 +345,7 @@
         <!-- BACK TO LOGIN -->
 
         <a
-            href="login-test.html"
+            href="login.jsp"
             class="back-login"
         >
 
@@ -416,7 +417,7 @@
 
             Remember your password?
 
-            <a href="login-test.html">
+            <a href="login.jsp">
                 Login here
             </a>
 

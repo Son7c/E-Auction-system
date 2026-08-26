@@ -25,29 +25,31 @@ public class LoginServlet extends HttpServlet {
         // 1. Create LoginForm
         LoginForm loginForm = new LoginForm();
 
-        // 2. Get login data from form
-        loginForm.setEmail(request.getParameter("email"));
+        // 2. Get login data from form (supports both 'email' and 'username' form input names)
+        String email = request.getParameter("email");
+        if (email == null || email.trim().isEmpty()) {
+            email = request.getParameter("username");
+        }
+        loginForm.setEmail(email);
         loginForm.setPassword(request.getParameter("password"));
 
         // 3. Fetch user from database
         UserDAO userDAO = new UserDAO();
 
-        UserForm user = userDAO.getUserByEmail(
-                loginForm.getEmail()
-        );
+        UserForm user = (loginForm.getEmail() != null) ? userDAO.getUserByEmail(loginForm.getEmail()) : null;
 
         // 4. Verify password
         if (user != null &&
+                loginForm.getPassword() != null &&
                 PasswordUtil.verify(
                         loginForm.getPassword(),
                         user.getPassword())) {
 
-            // 5. Create session
+            // 5. Create session & redirect to homepage
             HttpSession session = request.getSession();
-
             session.setAttribute("user", user);
 
-            // Temporary testing response
+            response.sendRedirect("homepage.jsp");
             response.setContentType("text/html");
             response.getWriter().println(
                     "<h1>Login Successful!</h1>"
@@ -57,12 +59,8 @@ public class LoginServlet extends HttpServlet {
             );
 
         } else {
-
-            // Temporary testing response
-            response.setContentType("text/html");
-            response.getWriter().println(
-                    "<h1>Invalid email or password!</h1>"
-            );
+            // Redirect back with error query parameter
+            response.sendRedirect("login.jsp?error=invalid");
         }
     }
 }

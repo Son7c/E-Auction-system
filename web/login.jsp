@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -419,30 +420,33 @@
         </p>
 
 
+        <!-- ALERT NOTIFICATIONS -->
+        <div id="alertMessage" style="display: none; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center;"></div>
+
         <!-- ================= LOGIN FORM ================= -->
 
         <form
-            action="#"
+            action="login"
             method="post"
         >
 
 
-            <!-- USERNAME / EMAIL -->
+            <!-- EMAIL / USERNAME -->
 
             <div class="form-group">
 
-                <label for="username">
-                    Username or Email
+                <label for="email">
+                    Email Address
                 </label>
 
 
                 <div class="input-box">
 
                     <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Enter username or email"
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email address"
                         required
                     >
 
@@ -490,7 +494,7 @@
 
             <div class="forgot-row">
 
-                <a href="forgetpassword.html">
+                <a href="forgetpassword.jsp">
                     Forgot Password?
                 </a>
 
@@ -516,7 +520,7 @@
 
             Don't have an account?
 
-            <a href="test-signup.html">
+            <a href="signup.jsp">
                 Register here
             </a>
 
@@ -526,7 +530,7 @@
     </div>
 
 
-    <!-- ================= PASSWORD SHOW / HIDE ================= -->
+    <!-- ================= PASSWORD SHOW / HIDE & STATUS ALERTS ================= -->
 
     <script>
 
@@ -556,6 +560,26 @@
             }
 
         }
+
+        // Check for URL status parameters
+        window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const alertBox = document.getElementById("alertMessage");
+
+            if (urlParams.has("registered")) {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#dcfce7";
+                alertBox.style.color = "#15803d";
+                alertBox.style.border = "1px solid #bbf7d0";
+                alertBox.textContent = "Account created successfully! Please log in.";
+            } else if (urlParams.get("error") === "invalid") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "Invalid email or password. Please try again.";
+            }
+        });
 
     </script>
 

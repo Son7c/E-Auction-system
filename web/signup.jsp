@@ -1,3 +1,4 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -147,7 +148,8 @@
         }
 
 
-        .input-box input {
+        .input-box input,
+        .input-box select {
 
             width: 100%;
 
@@ -179,7 +181,8 @@
         }
 
 
-        .input-box input:focus {
+        .input-box input:focus,
+        .input-box select:focus {
 
             border-color: #1765e8;
 
@@ -399,10 +402,13 @@
         </p>
 
 
+        <!-- ALERT NOTIFICATION -->
+        <div id="alertMessage" style="display: none; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center;"></div>
+
         <!-- ================= REGISTRATION FORM ================= -->
 
         <form
-            action="#"
+            action="signup"
             method="post"
             onsubmit="return validateForm()"
         >
@@ -412,7 +418,7 @@
 
             <div class="form-group">
 
-                <label for="fullName">
+                <label for="name">
                     Full Name
                 </label>
 
@@ -420,8 +426,8 @@
 
                     <input
                         type="text"
-                        id="fullName"
-                        name="fullName"
+                        id="name"
+                        name="name"
                         placeholder="Enter your full name"
                         required
                     >
@@ -429,30 +435,6 @@
                 </div>
 
             </div>
-
-
-            <!-- USERNAME -->
-
-            <div class="form-group">
-
-                <label for="username">
-                    Username
-                </label>
-
-                <div class="input-box">
-
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Choose a username"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
 
             <!-- EMAIL -->
 
@@ -469,6 +451,98 @@
                         id="email"
                         name="email"
                         placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- PHONE NUMBER -->
+
+            <div class="form-group">
+
+                <label for="phoneNo">
+                    Phone Number
+                </label>
+
+                <div class="input-box">
+
+                    <input
+                        type="tel"
+                        id="phoneNo"
+                        name="phoneNo"
+                        placeholder="Enter phone number"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- ADDRESS -->
+
+            <div class="form-group">
+
+                <label for="address">
+                    Address
+                </label>
+
+                <div class="input-box">
+
+                    <input
+                        type="text"
+                        id="address"
+                        name="address"
+                        placeholder="Enter your address"
+                        required
+                    >
+
+                </div>
+
+            </div>
+
+            <!-- SECURITY QUESTION -->
+
+            <div class="form-group">
+
+                <label for="securityQuestion">
+                    Security Question
+                </label>
+
+                <div class="input-box">
+
+                    <select
+                        id="securityQuestion"
+                        name="securityQuestion"
+                        required
+                    >
+                        <option value="">Select a Security Question</option>
+                        <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
+                        <option value="What was the name of your first pet?">What was the name of your first pet?</option>
+                        <option value="What city were you born in?">What city were you born in?</option>
+                        <option value="What is your favorite book?">What is your favorite book?</option>
+                    </select>
+
+                </div>
+
+            </div>
+
+            <!-- SECURITY ANSWER -->
+
+            <div class="form-group">
+
+                <label for="securityAnswer">
+                    Security Answer
+                </label>
+
+                <div class="input-box">
+
+                    <input
+                        type="text"
+                        id="securityAnswer"
+                        name="securityAnswer"
+                        placeholder="Enter security answer"
                         required
                     >
 
@@ -570,7 +644,7 @@
 
             Already have an account?
 
-            <a href="login-test.html">
+            <a href="login.jsp">
                 Login here
             </a>
 
@@ -643,6 +717,20 @@
             return true;
 
         }
+
+        // Check for URL status parameters
+        window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const alertBox = document.getElementById("alertMessage");
+
+            if (urlParams.get("error") === "failed") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "Registration failed. Email may already be in use or data invalid.";
+            }
+        });
 
     </script>
 
