@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebServlet({"/signup", "/SignUpServlet"})
+@WebServlet("/signup")
 public class SignUpServlet extends HttpServlet {
 
     @Override

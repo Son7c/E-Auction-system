@@ -82,4 +82,29 @@ public class UserDAO {
 
         return null;
     }
+
+    public boolean updatePassword(String email, String newPassword) {
+        String passwordHash = PasswordUtil.hash(newPassword);
+
+        String sql = """
+            UPDATE USERS
+            SET PASSWORD_HASH = ?
+            WHERE EMAIL = ?
+            """;
+
+        try (
+                Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setString(1, passwordHash);
+            ps.setString(2, email);
+
+            int rows = ps.executeUpdate();
+
+            return rows > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }

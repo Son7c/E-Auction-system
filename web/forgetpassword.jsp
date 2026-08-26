@@ -362,18 +362,20 @@
 
 
         <p class="description">
-
             Don't worry. Enter the email address
-            associated with your account and we'll
-            send you a link to reset your password.
-
+            associated with your account and answer your
+            security question to reset your password.
         </p>
+
+
+        <!-- ALERT NOTIFICATION -->
+        <div id="alertMessage" style="display: none; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center;"></div>
 
 
         <!-- FORM -->
 
         <form
-            action="#"
+            action="ForgotPassword"
             method="post"
         >
 
@@ -403,7 +405,7 @@
                 class="reset-button"
             >
 
-                Send Reset Link
+                Continue
 
             </button>
 
@@ -425,6 +427,28 @@
 
 
     </div>
+
+    <!-- ================= STATUS ALERTS ================= -->
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const alertBox = document.getElementById("alertMessage");
+
+            if (urlParams.get("error") === "notfound") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "No account found with this email address.";
+            } else if (urlParams.get("error") === "empty") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "Please provide an email address.";
+            }
+        });
+    </script>
 
 </body>
 

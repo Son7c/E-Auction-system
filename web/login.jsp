@@ -572,6 +572,12 @@
                 alertBox.style.color = "#15803d";
                 alertBox.style.border = "1px solid #bbf7d0";
                 alertBox.textContent = "Account created successfully! Please log in.";
+            } else if (urlParams.has("reset")) {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#dcfce7";
+                alertBox.style.color = "#15803d";
+                alertBox.style.border = "1px solid #bbf7d0";
+                alertBox.textContent = "Password reset successfully! Please log in with your new password.";
             } else if (urlParams.get("error") === "invalid") {
                 alertBox.style.display = "block";
                 alertBox.style.background = "#fee2e2";

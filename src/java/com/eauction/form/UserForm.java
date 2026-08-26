@@ -9,6 +9,7 @@ package com.eauction.form;
  * @author son7c
  */
 public class UserForm {
+    private int userId;
     private String name;
     private String email;
     private String password;
@@ -18,6 +19,14 @@ public class UserForm {
     private String securityAnswer;
     
     public UserForm(){
+    }
+    
+    public int getUserId() {
+        return userId;
+    }
+
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
     
     public String getName() {
