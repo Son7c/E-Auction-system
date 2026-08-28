@@ -1,8 +1,17 @@
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="com.eauction.form.UserForm"%>
 <%
-    UserForm navbarUser = (UserForm) session.getAttribute("user");
-    String requestURI = request.getRequestURI();
+    UserForm navbarUser = null;
+    try {
+        if (session != null) {
+            Object userObj = session.getAttribute("user");
+            if (userObj instanceof UserForm) {
+                navbarUser = (UserForm) userObj;
+            }
+        }
+    } catch (Exception e) {
+        navbarUser = null;
+    }
+    String requestURI = (request != null && request.getRequestURI() != null) ? request.getRequestURI() : "";
     boolean isHome = requestURI.endsWith("homepage.jsp") || requestURI.endsWith("/");
     boolean isAuctions = requestURI.endsWith("bidding.jsp");
 %>

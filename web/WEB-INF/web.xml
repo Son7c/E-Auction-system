@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="6.0" xmlns="https://jakarta.ee/xml/ns/jakartaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd">
+    <servlet>
+        <servlet-name>ItemServlet</servlet-name>
+        <servlet-class>com.eauction.servlet.ItemServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AuctionServlet</servlet-name>
+        <servlet-class>com.eauction.servlet.AuctionServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ItemServlet</servlet-name>
+        <url-pattern>/ItemServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AuctionServlet</servlet-name>
+        <url-pattern>/AuctionServlet</url-pattern>
+    </servlet-mapping>
     <welcome-file-list>
         <welcome-file>homepage.jsp</welcome-file>
     </welcome-file-list>

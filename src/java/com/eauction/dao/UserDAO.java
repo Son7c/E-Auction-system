@@ -64,7 +64,8 @@ public class UserDAO {
             if (rs.next()) {
 
                 UserForm user = new UserForm();
-
+                
+                user.setUserId(rs.getInt("USER_ID"));
                 user.setName(rs.getString("NAME"));
                 user.setEmail(rs.getString("EMAIL"));
                 user.setPassword(rs.getString("PASSWORD_HASH"));

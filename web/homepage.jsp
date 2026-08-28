@@ -43,7 +43,7 @@
                 padding: 0;
                 font-family: Arial, Helvetica, sans-serif;
                 color: #0f172a;
-                background: #06152b;
+                background: #ffffff;
                 display: flex;
                 flex-direction: column;
                 overflow-x: hidden;
@@ -1103,19 +1103,10 @@
             }
 
 
-            /* ===== FINAL WHITE-GAP / OVERSCROLL PROTECTION ===== */
+            /* ===== FINAL OVERSCROLL PROTECTION ===== */
             html,
             body {
-                background: #06152b !important;
                 overscroll-behavior: none;
-            }
-
-            body::after {
-                content: "";
-                display: block;
-                width: 100%;
-                height: 0;
-                background: #06152b;
             }
 
         </style>
@@ -1128,7 +1119,7 @@
 
         <!-- ================= NAVIGATION ================= -->
 
-        <jsp:include page="navbar.jsp" />
+        <%@include file="navbar.jsp" %>
 
 
 

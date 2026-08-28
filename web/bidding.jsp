@@ -545,7 +545,7 @@
 
     <!-- ================= NAVIGATION ================= -->
 
-    <jsp:include page="navbar.jsp" />
+    <%@include file="navbar.jsp" %>
 
 
 

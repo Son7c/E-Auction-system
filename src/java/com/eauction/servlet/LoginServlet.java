@@ -50,13 +50,6 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("user", user);
 
             response.sendRedirect("homepage.jsp");
-            response.setContentType("text/html");
-            response.getWriter().println(
-                    "<h1>Login Successful!</h1>"
-            );
-            response.getWriter().println(
-                    "<p>Welcome, " + user.getName() + "</p>"
-            );
 
         } else {
             // Redirect back with error query parameter

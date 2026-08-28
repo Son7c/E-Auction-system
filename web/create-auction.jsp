@@ -1,4 +1,15 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="com.eauction.form.UserForm"%>
+<%
+    UserForm loggedInUser = null;
+    if (session != null && session.getAttribute("user") instanceof UserForm) {
+        loggedInUser = (UserForm) session.getAttribute("user");
+    }
+    if (loggedInUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
+%>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -846,7 +857,7 @@
 
     <!-- ================= NAVIGATION ================= -->
 
-    <jsp:include page="navbar.jsp" />
+    <%@include file="navbar.jsp" %>
 
 
 
@@ -887,10 +898,14 @@
 
         <div class="form-card">
 
+            <!-- ALERT NOTIFICATION -->
+            <div id="alertMessage" style="display: none; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center;"></div>
 
             <form
                 id="auctionForm"
-                onsubmit="createAuction(event)"
+                action="createItem"
+                method="post"
+                onsubmit="return validateDates()"
             >
 
 
@@ -928,6 +943,7 @@
                             <input
                                 type="text"
                                 id="itemName"
+                                name="name"
                                 placeholder="e.g. Canon EOS 200D Camera"
                                 required
                             >
@@ -947,6 +963,7 @@
 
                             <select
                                 id="category"
+                                name="category"
                                 required
                             >
 
@@ -1003,6 +1020,7 @@
 
                             <textarea
                                 id="description"
+                                name="description"
                                 placeholder="Describe the item, its condition, features, specifications, etc."
                                 required
                             ></textarea>
@@ -1040,41 +1058,25 @@
                     </div>
 
 
-                    <label
-                        class="upload-area"
-                        for="itemImage"
-                    >
+                    <div class="form-group full">
 
+                        <label for="imageUrl">
+                            Image URL
+                        </label>
 
-                        <div class="upload-icon">
-                            📷
-                        </div>
+                        <input
+                            type="url"
+                            id="imageUrl"
+                            name="imageUrl"
+                            placeholder="e.g. https://example.com/image.jpg or images/auction.png"
+                            oninput="previewImageUrl(this.value)"
+                        >
 
+                        <span class="help-text">
+                            Enter a direct web image link or local image path.
+                        </span>
 
-                        <h3>
-                            Upload Item Image
-                        </h3>
-
-
-                        <p>
-                            Click here to select an image
-                        </p>
-
-
-                        <small>
-                            JPG, JPEG, PNG • Maximum 5 MB
-                        </small>
-
-
-                    </label>
-
-
-                    <input
-                        type="file"
-                        id="itemImage"
-                        accept="image/jpeg,image/png,image/jpg"
-                        onchange="previewImage(event)"
-                    >
+                    </div>
 
 
                     <div
@@ -1085,6 +1087,7 @@
                         <img
                             id="imagePreview"
                             alt="Item Preview"
+                            onerror="handleImageError()"
                         >
 
 
@@ -1137,6 +1140,7 @@
                             <input
                                 type="number"
                                 id="startingPrice"
+                                name="startingPrice"
                                 placeholder="e.g. 5000"
                                 min="1"
                                 required
@@ -1163,6 +1167,7 @@
                             <input
                                 type="number"
                                 id="bidIncrement"
+                                name="bidIncrement"
                                 placeholder="e.g. 500"
                                 min="1"
                                 required
@@ -1189,6 +1194,7 @@
                             <input
                                 type="datetime-local"
                                 id="startDate"
+                                name="startDate"
                                 required
                             >
 
@@ -1208,6 +1214,7 @@
                             <input
                                 type="datetime-local"
                                 id="endDate"
+                                name="endDate"
                                 required
                             >
 
@@ -1286,11 +1293,7 @@
 
         /* ================= IMAGE PREVIEW ================= */
 
-        function previewImage(event) {
-
-            const file =
-                event.target.files[0];
-
+        function previewImageUrl(url) {
 
             const preview =
                 document.getElementById("imagePreview");
@@ -1300,40 +1303,33 @@
                 document.getElementById("previewContainer");
 
 
-            if (!file) {
-                return;
-            }
+            const trimmedUrl = url.trim();
 
+            if (!trimmedUrl) {
 
-            /* CHECK FILE SIZE */
+                container.style.display = "none";
 
-            if (file.size > 5 * 1024 * 1024) {
-
-                alert(
-                    "Image size must be less than 5 MB."
-                );
-
-                event.target.value = "";
+                preview.src = "";
 
                 return;
 
             }
 
 
-            const reader =
-                new FileReader();
+            preview.src = trimmedUrl;
+
+            container.style.display = "block";
+
+        }
 
 
-            reader.onload = function(e) {
 
-                preview.src = e.target.result;
+        function handleImageError() {
 
-                container.style.display = "block";
+            const container =
+                document.getElementById("previewContainer");
 
-            };
-
-
-            reader.readAsDataURL(file);
+            container.style.display = "none";
 
         }
 
@@ -1343,9 +1339,14 @@
 
         function removeImage() {
 
-            document
-                .getElementById("itemImage")
-                .value = "";
+            const imageUrlInput =
+                document.getElementById("imageUrl");
+
+            if (imageUrlInput) {
+
+                imageUrlInput.value = "";
+
+            }
 
 
             document
@@ -1361,82 +1362,34 @@
 
 
 
-        /* ================= CREATE AUCTION ================= */
+        /* ================= VALIDATE DATES BEFORE SUBMIT ================= */
 
-        function createAuction(event) {
+        function validateDates() {
 
-            event.preventDefault();
+            const startVal =
+                document.getElementById("startDate").value;
 
+            const endVal =
+                document.getElementById("endDate").value;
 
-            const startDate =
-                new Date(
-                    document
-                    .getElementById("startDate")
-                    .value
-                );
+            if (startVal && endVal) {
 
+                const startDate = new Date(startVal);
+                const endDate = new Date(endVal);
 
-            const endDate =
-                new Date(
-                    document
-                    .getElementById("endDate")
-                    .value
-                );
+                if (endDate <= startDate) {
 
+                    alert(
+                        "Auction end time must be after the start time."
+                    );
 
-            /* CHECK DATE */
+                    return false;
 
-            if (endDate <= startDate) {
-
-                alert(
-                    "Auction end time must be after the start time."
-                );
-
-                return;
+                }
 
             }
 
-
-            /* GET FORM DATA */
-
-            const itemName =
-                document
-                .getElementById("itemName")
-                .value;
-
-
-            const category =
-                document
-                .getElementById("category")
-                .value;
-
-
-            const startingPrice =
-                document
-                .getElementById("startingPrice")
-                .value;
-
-
-            /*
-             * FRONTEND TEST ONLY
-             *
-             * Later this data will be sent to
-             * your Java Servlet and DAO.
-             */
-
-
-            alert(
-                "Auction created successfully!"
-            );
-
-
-            /*
-             * After backend integration:
-             *
-             * window.location.href =
-             * "bidding.jsp";
-             */
-
+            return true;
 
         }
 
@@ -1460,6 +1413,19 @@
             }
 
         }
+
+        // Check for URL status parameters
+        window.addEventListener("DOMContentLoaded", () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const alertBox = document.getElementById("alertMessage");
+            if (alertBox && urlParams.get("error") === "failed") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "Failed to create auction. Please try again.";
+            }
+        });
 
     </script>
 
