@@ -12,13 +12,14 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.util.List;
 
 @WebServlet("/createItem")
 public class ItemServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request,
-                           HttpServletResponse response)
+            HttpServletResponse response)
             throws ServletException, IOException {
 
         // Get existing session
@@ -67,5 +68,20 @@ public class ItemServlet extends HttpServlet {
                     "<h1>Item Creation Failed!</h1>"
             );
         }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response)
+            throws ServletException, IOException {
+
+        ItemDAO itemDAO = new ItemDAO();
+
+        List<ItemForm> items = itemDAO.getAllItems();
+
+        request.setAttribute("items", items);
+
+        request.getRequestDispatcher("homepage.jsp")
+        .forward(request, response);
     }
 }

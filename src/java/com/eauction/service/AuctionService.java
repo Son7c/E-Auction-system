@@ -9,8 +9,19 @@ import com.eauction.util.DBConnection;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 public class AuctionService {
+    public List<AuctionForm> getAllAuctions() {
+        AuctionDAO auctionDAO = new AuctionDAO();
+        return auctionDAO.getAllAuctions();
+    }
+
+    public List<ItemForm> getAllItems() {
+        ItemDAO itemDAO = new ItemDAO();
+        return itemDAO.getAllItems();
+    }
+
     public boolean createItemWithAuction(
             ItemForm item,AuctionForm auction
     ){

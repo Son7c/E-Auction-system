@@ -14,10 +14,60 @@ import jakarta.servlet.http.HttpSession;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 
-@WebServlet("/createAuction")
+@WebServlet(urlPatterns = {"/createAuction", "/getAllAuctions"})
 public class AuctionServlet extends HttpServlet {
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("application/json;charset=UTF-8");
+
+        AuctionService auctionService = new AuctionService();
+        List<AuctionForm> auctions = auctionService.getAllAuctions();
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < auctions.size(); i++) {
+            AuctionForm a = auctions.get(i);
+            sb.append("{");
+            sb.append("\"auctionId\":").append(a.getAuctionId()).append(",");
+            sb.append("\"itemId\":").append(a.getItemId()).append(",");
+            sb.append("\"startingBid\":").append(a.getStartingBid()).append(",");
+            sb.append("\"highestBid\":").append(a.getHighestBid()).append(",");
+            sb.append("\"startTime\":").append(escapeJson(a.getStartTime() != null ? a.getStartTime().toString() : "")).append(",");
+            sb.append("\"endTime\":").append(escapeJson(a.getEndTime() != null ? a.getEndTime().toString() : "")).append(",");
+            sb.append("\"status\":").append(escapeJson(a.getStatus())).append(",");
+            sb.append("\"sellerId\":").append(a.getSellerId()).append(",");
+            sb.append("\"name\":").append(escapeJson(a.getName())).append(",");
+            sb.append("\"description\":").append(escapeJson(a.getDescription())).append(",");
+            sb.append("\"category\":").append(escapeJson(a.getCategory())).append(",");
+            sb.append("\"imageUrl\":").append(escapeJson(a.getImageUrl()));
+            sb.append("}");
+            if (i < auctions.size() - 1) {
+                sb.append(",");
+            }
+        }
+        sb.append("]");
+
+        response.getWriter().write(sb.toString());
+    }
+
+    private String escapeJson(String input) {
+        if (input == null) {
+            return "null";
+        }
+        return "\"" + input.replace("\\", "\\\\")
+                           .replace("\"", "\\\"")
+                           .replace("\b", "\\b")
+                           .replace("\f", "\\f")
+                           .replace("\n", "\\n")
+                           .replace("\r", "\\r")
+                           .replace("\t", "\\t") + "\"";
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -72,16 +122,10 @@ public class AuctionServlet extends HttpServlet {
                         auction
                 );
 
-        response.setContentType("text/html");
-
         if (success) {
-            response.getWriter().println(
-                    "<h1>Item and Auction Created Successfully!</h1>"
-            );
+            response.sendRedirect("bidding.jsp?created=success");
         } else {
-            response.getWriter().println(
-                    "<h1>Creation Failed!</h1>"
-            );
+            response.sendRedirect("create-auction.jsp?error=failed");
         }
     }
 }

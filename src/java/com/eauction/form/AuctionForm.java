@@ -11,8 +11,23 @@ public class AuctionForm {
     private Timestamp startTime;
     private Timestamp endTime;
     private String status;
+
+    private ItemForm item;
+    private int sellerId;
+    private String name;
+    private String description;
+    private String category;
+    private String imageUrl;
     
     public AuctionForm(){
+    }
+
+    public ItemForm getItem() {
+        return item;
+    }
+
+    public void setItem(ItemForm item) {
+        this.item = item;
     }
     
     public int getAuctionId() {
@@ -69,5 +84,45 @@ public class AuctionForm {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public int getSellerId() {
+        return sellerId;
+    }
+
+    public void setSellerId(int sellerId) {
+        this.sellerId = sellerId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 }

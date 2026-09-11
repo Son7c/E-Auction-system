@@ -40,7 +40,7 @@
             margin: 0;
             padding: 0;
             scroll-behavior: smooth;
-            background: #06152b;
+            background: #f7f9fc;
             overscroll-behavior: none;
         }
 
@@ -903,7 +903,7 @@
 
             <form
                 id="auctionForm"
-                action="createItem"
+                action="createAuction"
                 method="post"
                 onsubmit="return validateDates()"
             >
@@ -1140,9 +1140,10 @@
                             <input
                                 type="number"
                                 id="startingPrice"
-                                name="startingPrice"
+                                name="startingBid"
                                 placeholder="e.g. 5000"
                                 min="1"
+                                step="any"
                                 required
                             >
 
@@ -1170,6 +1171,7 @@
                                 name="bidIncrement"
                                 placeholder="e.g. 500"
                                 min="1"
+                                step="any"
                                 required
                             >
 
@@ -1194,7 +1196,7 @@
                             <input
                                 type="datetime-local"
                                 id="startDate"
-                                name="startDate"
+                                name="startTime"
                                 required
                             >
 
@@ -1214,7 +1216,7 @@
                             <input
                                 type="datetime-local"
                                 id="endDate"
-                                name="endDate"
+                                name="endTime"
                                 required
                             >
 

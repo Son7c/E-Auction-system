@@ -2,10 +2,15 @@
 package com.eauction.dao;
 
 import com.eauction.form.AuctionForm;
+import com.eauction.util.DBConnection;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
 public class AuctionDAO {
     public boolean createAuction(AuctionForm auction, Connection con) {
         String sql = """
@@ -28,5 +33,46 @@ public class AuctionDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    public List<AuctionForm> getAllAuctions() {
+        List<AuctionForm> auctions = new ArrayList<>();
+        String sql = """
+            SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
+                   a.START_TIME, a.END_TIME, a.STATUS,
+                   i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL
+            FROM AUCTIONS a
+            JOIN ITEMS i ON a.ITEM_ID = i.ITEM_ID
+            ORDER BY a.AUCTION_ID DESC
+            """;
+        try (
+                Connection con = DBConnection.getConnection();
+                PreparedStatement ps = con.prepareStatement(sql);
+                ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                AuctionForm auction = new AuctionForm();
+                auction.setAuctionId(rs.getInt("AUCTION_ID"));
+                auction.setItemId(rs.getInt("ITEM_ID"));
+                auction.setStartingBid(rs.getDouble("STARTING_BID"));
+                auction.setHighestBid(rs.getDouble("HIGHEST_BID"));
+                auction.setStartTime(rs.getTimestamp("START_TIME"));
+                auction.setEndTime(rs.getTimestamp("END_TIME"));
+                auction.setStatus(rs.getString("STATUS"));
+
+                auction.setSellerId(rs.getInt("SELLER_ID"));
+                auction.setName(rs.getString("NAME"));
+                auction.setDescription(rs.getString("DESCRIPTION"));
+                auction.setCategory(rs.getString("CATEGORY"));
+                auction.setImageUrl(rs.getString("IMAGE_URL"));
+
+                auctions.add(auction);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return auctions;
     }
 }
