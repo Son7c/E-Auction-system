@@ -14,7 +14,8 @@
     }
     String requestURI = (request != null && request.getRequestURI() != null) ? request.getRequestURI() : "";
     boolean isHome = requestURI.endsWith("homepage.jsp") || requestURI.endsWith("/");
-    boolean isAuctions = requestURI.endsWith("bidding.jsp");
+    boolean isAuctions = requestURI.endsWith("bidding.jsp") || requestURI.endsWith("bid.jsp");
+    boolean isDashboard = requestURI.endsWith("dashboard.jsp");
 %>
 <!-- ================= NAVIGATION ================= -->
 <nav class="navbar">
@@ -74,7 +75,9 @@
                 Register
             </a>
         <% } else { %>
-            <span class="username"><%= navbarUser.getName() %></span>
+            <a href="dashboard.jsp" class="dashboard-nav-btn <%= isDashboard ? "active" : "" %>" style="display: inline-flex; align-items: center; gap: 5px; padding: 7px 13px; background: rgba(37,99,235,0.2); color: #93c5fd; border: 1px solid #3b82f6; border-radius: 6px; text-decoration: none; font-size: 12px; font-weight: 700;">
+                📊 Dashboard (<%= navbarUser.getName() %>)
+            </a>
             <a href="LogoutServlet" class="logout-btn">
                 Logout
             </a>

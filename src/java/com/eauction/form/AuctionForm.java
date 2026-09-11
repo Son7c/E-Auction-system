@@ -125,4 +125,14 @@ public class AuctionForm {
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
     }
+
+    private int bidCount;
+
+    public int getBidCount() {
+        return bidCount;
+    }
+
+    public void setBidCount(int bidCount) {
+        this.bidCount = bidCount;
+    }
 }

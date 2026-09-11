@@ -17,6 +17,11 @@ public class AuctionService {
         return auctionDAO.getAllAuctions();
     }
 
+    public AuctionForm getAuctionById(int auctionId) {
+        AuctionDAO auctionDAO = new AuctionDAO();
+        return auctionDAO.getAuctionById(auctionId);
+    }
+
     public List<ItemForm> getAllItems() {
         ItemDAO itemDAO = new ItemDAO();
         return itemDAO.getAllItems();
@@ -75,5 +80,10 @@ public class AuctionService {
                 e.printStackTrace();
             }
         }
+    }
+
+    public List<AuctionForm> getAuctionsBySellerId(int sellerId) {
+        AuctionDAO auctionDAO = new AuctionDAO();
+        return auctionDAO.getAuctionsBySellerId(sellerId);
     }
 }
