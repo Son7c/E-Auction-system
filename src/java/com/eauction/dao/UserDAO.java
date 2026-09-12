@@ -84,6 +84,42 @@ public class UserDAO {
         return null;
     }
 
+    public UserForm getUserById(int userId) {
+        String sql = """
+            SELECT USER_ID, NAME, EMAIL, PASSWORD_HASH,
+                   PHONE_NO, ADDRESS,
+                   SECURITY_QUESTION, SECURITY_ANSWER_HASH
+            FROM USERS
+            WHERE USER_ID = ?
+            """;
+
+        try (
+                Connection con = DBConnection.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                UserForm user = new UserForm();
+                user.setUserId(rs.getInt("USER_ID"));
+                user.setName(rs.getString("NAME"));
+                user.setEmail(rs.getString("EMAIL"));
+                user.setPassword(rs.getString("PASSWORD_HASH"));
+                user.setPhoneNo(rs.getString("PHONE_NO"));
+                user.setAddress(rs.getString("ADDRESS"));
+                user.setSecurityQuestion(rs.getString("SECURITY_QUESTION"));
+                user.setSecurityAnswer(rs.getString("SECURITY_ANSWER_HASH"));
+                return user;
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+
     public boolean updatePassword(String email, String newPassword) {
         String passwordHash = PasswordUtil.hash(newPassword);
 

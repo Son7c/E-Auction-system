@@ -381,12 +381,13 @@
             box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
             transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
             position: relative;
+            cursor: pointer;
         }
 
         .auction-card:hover {
             transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.08);
-            border-color: #cbd5e1;
+            box-shadow: 0 12px 24px rgba(15, 23, 42, 0.1);
+            border-color: #2563eb;
         }
 
         .card-media {
@@ -1157,8 +1158,8 @@
                 : '<div class="card-media-fallback"><span>' + icon + '</span><small>' + escapeHTML(auction.category || "Item") + '</small></div>';
 
             const actionBtn = statusInfo.isLive
-                ? '<a href="bid.jsp?auctionId=' + auction.auctionId + '" class="bid-btn">🔨 Place Bid</a>'
-                : '<button class="bid-btn disabled" disabled>' + (statusInfo.key === "upcoming" ? "Starts Soon" : "Auction Ended") + '</button>';
+                ? '<a href="bid.jsp?auctionId=' + auction.auctionId + '" class="bid-btn" onclick="event.stopPropagation();">🔨 Place Bid</a>'
+                : '<a href="bid.jsp?auctionId=' + auction.auctionId + '" class="bid-btn disabled" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;" onclick="event.stopPropagation();">' + (statusInfo.key === "upcoming" ? "⏱ Starts Soon" : "View Auction") + '</a>';
 
             const cardCategory = escapeHTML(auction.category || "");
             const categoryBadge = escapeHTML(auction.category || "General");
@@ -1167,7 +1168,7 @@
             const startPrice = Number(auction.startingBid || 0).toLocaleString("en-IN");
             const endTimeVal = escapeHTML(auction.endTime || "");
 
-            return '<article class="auction-card" data-category="' + cardCategory + '">' +
+            return '<article class="auction-card" data-category="' + cardCategory + '" onclick="window.location.href=\'bid.jsp?auctionId=' + auction.auctionId + '\'">' +
                 '<div class="card-media">' +
                     mediaHTML +
                     '<span class="card-status-badge ' + statusInfo.badgeClass + '">' +

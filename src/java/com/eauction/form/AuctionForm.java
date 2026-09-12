@@ -14,6 +14,7 @@ public class AuctionForm {
 
     private ItemForm item;
     private int sellerId;
+    private String sellerName;
     private String name;
     private String description;
     private String category;
@@ -92,6 +93,14 @@ public class AuctionForm {
 
     public void setSellerId(int sellerId) {
         this.sellerId = sellerId;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
     }
 
     public String getName() {

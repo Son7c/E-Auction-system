@@ -40,9 +40,11 @@ public class AuctionDAO {
         String sql = """
             SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
                    a.START_TIME, a.END_TIME, a.STATUS,
-                   i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL
+                   i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL,
+                   u.NAME AS SELLER_NAME
             FROM AUCTIONS a
             JOIN ITEMS i ON a.ITEM_ID = i.ITEM_ID
+            LEFT JOIN USERS u ON i.SELLER_ID = u.USER_ID
             ORDER BY a.AUCTION_ID DESC
             """;
         try (
@@ -65,6 +67,7 @@ public class AuctionDAO {
                 auction.setDescription(rs.getString("DESCRIPTION"));
                 auction.setCategory(rs.getString("CATEGORY"));
                 auction.setImageUrl(rs.getString("IMAGE_URL"));
+                auction.setSellerName(rs.getString("SELLER_NAME"));
 
                 auctions.add(auction);
             }
@@ -109,6 +112,7 @@ public class AuctionDAO {
                     auction.setDescription(rs.getString("DESCRIPTION"));
                     auction.setCategory(rs.getString("CATEGORY"));
                     auction.setImageUrl(rs.getString("IMAGE_URL"));
+                    auction.setSellerName(rs.getString("SELLER_NAME"));
                     return auction;
                 }
             }
@@ -126,9 +130,11 @@ public class AuctionDAO {
             SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
                    a.START_TIME, a.END_TIME, a.STATUS,
                    i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL,
+                   u.NAME AS SELLER_NAME,
                    (SELECT COUNT(*) FROM BIDS b WHERE b.AUCTION_ID = a.AUCTION_ID) AS BID_COUNT
             FROM AUCTIONS a
             JOIN ITEMS i ON a.ITEM_ID = i.ITEM_ID
+            LEFT JOIN USERS u ON i.SELLER_ID = u.USER_ID
             WHERE i.SELLER_ID = ?
             ORDER BY a.AUCTION_ID DESC
             """;
@@ -153,6 +159,7 @@ public class AuctionDAO {
                     auction.setDescription(rs.getString("DESCRIPTION"));
                     auction.setCategory(rs.getString("CATEGORY"));
                     auction.setImageUrl(rs.getString("IMAGE_URL"));
+                    auction.setSellerName(rs.getString("SELLER_NAME"));
                     auction.setBidCount(rs.getInt("BID_COUNT"));
 
                     list.add(auction);

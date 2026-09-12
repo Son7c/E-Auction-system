@@ -40,6 +40,7 @@ public class AuctionServlet extends HttpServlet {
             sb.append("\"endTime\":").append(escapeJson(a.getEndTime() != null ? a.getEndTime().toString() : "")).append(",");
             sb.append("\"status\":").append(escapeJson(a.getStatus())).append(",");
             sb.append("\"sellerId\":").append(a.getSellerId()).append(",");
+            sb.append("\"sellerName\":").append(escapeJson(a.getSellerName())).append(",");
             sb.append("\"name\":").append(escapeJson(a.getName())).append(",");
             sb.append("\"description\":").append(escapeJson(a.getDescription())).append(",");
             sb.append("\"category\":").append(escapeJson(a.getCategory())).append(",");

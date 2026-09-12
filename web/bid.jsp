@@ -803,7 +803,7 @@
                         <div class="item-meta">
                             <span>🏷️ ID: #<%= auction.getAuctionId() %></span>
                             <span>📁 Category: <%= auction.getCategory() != null ? auction.getCategory() : "General" %></span>
-                            <span>👤 Seller ID: #<%= auction.getSellerId() %></span>
+                            <span>👤 Seller: <%= (auction.getSellerName() != null && !auction.getSellerName().trim().isEmpty()) ? auction.getSellerName() : ("Seller #" + auction.getSellerId()) %></span>
                         </div>
                     </div>
 
@@ -848,7 +848,7 @@
                     <!-- PRICING SUMMARY -->
                     <div class="pricing-summary">
                         <div class="price-label">
-                            <%= (auction.getHighestBid() > 0) ? "Current Highest Bid" : "Starting Price" %>
+                            <%= isClosed ? "Final Closing Price" : ((auction.getHighestBid() > 0) ? "Current Highest Bid" : "Starting Price") %>
                         </div>
                         <div class="current-price">
                             ₹<%= String.format("%,.2f", currentPrice) %>
@@ -881,8 +881,32 @@
                     <!-- BID PLACEMENT FORM / GUEST ACTIONS -->
                     <% if (isClosed) { %>
                         <div class="alert alert-error">
-                            This auction has officially closed. No further bids can be accepted.
+                            🔒 This auction has officially closed. No further bids can be accepted.
                         </div>
+                        <% if (!bidHistory.isEmpty()) { 
+                               BidForm winner = bidHistory.get(0);
+                               String winnerName = (winner.getBidderName() != null && !winner.getBidderName().trim().isEmpty())
+                                   ? winner.getBidderName()
+                                   : ("Bidder #" + winner.getBidderId());
+                               boolean isWinnerUser = loggedInUser != null && loggedInUser.getUserId() == winner.getBidderId();
+                        %>
+                            <div style="background: <%= isWinnerUser ? "#ecfdf5" : "#f8fafc" %>; border: 2px solid <%= isWinnerUser ? "#10b981" : "#cbd5e1" %>; border-radius: 10px; padding: 18px 20px; text-align: center; margin-bottom: 14px;">
+                                <div style="font-size: 32px; margin-bottom: 6px;"><%= isWinnerUser ? "🎉 🏆" : "🏆" %></div>
+                                <div style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: <%= isWinnerUser ? "#059669" : "#64748b" %>; margin-bottom: 4px;">
+                                    <%= isWinnerUser ? "Winning Confirmation" : "Official Auction Winner" %>
+                                </div>
+                                <div style="font-size: 20px; font-weight: 800; color: <%= isWinnerUser ? "#065f46" : "#0f172a" %>; margin-bottom: 8px;">
+                                    <%= isWinnerUser ? "You Won This Auction!" : winnerName %>
+                                </div>
+                                <div style="font-size: 13px; color: #475569;">
+                                    Final Winning Bid: <strong style="color: #1765e8; font-size: 16px;">₹<%= String.format("%,.2f", winner.getBidAmount()) %></strong>
+                                </div>
+                            </div>
+                        <% } else { %>
+                            <div class="alert alert-info">
+                                ℹ️ This auction closed with no bids placed.
+                            </div>
+                        <% } %>
                     <% } else if (isUpcoming) { %>
                         <div class="alert alert-info">
                             This auction has not started yet. Bidding will open on <%= startTimeFormatted %>.
