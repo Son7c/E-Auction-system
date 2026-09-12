@@ -708,9 +708,15 @@
                                             <%= !b.isTopBidder() ? "Increase Bid ⚡" : "View Auction →" %>
                                         </a>
                                     <% } else { %>
-                                        <a href="bid.jsp?auctionId=<%= b.getAuctionId() %>" class="action-link secondary">
-                                            View Result →
-                                        </a>
+                                        <% if (b.isTopBidder()) { %>
+                                            <a href="certificate?auctionId=<%= b.getAuctionId() %>" class="action-link" style="background: #10b981; border-color: #10b981; color: white;">
+                                                Certificate
+                                            </a>
+                                        <% } else { %>
+                                            <a href="bid.jsp?auctionId=<%= b.getAuctionId() %>" class="action-link secondary">
+                                                View Result →
+                                            </a>
+                                        <% } %>
                                     <% } %>
                                 </td>
                             </tr>
@@ -787,6 +793,15 @@
                                     <%= a.getEndTime() != null ? sdf.format(a.getEndTime()) : "Open Ended" %>
                                 </td>
                                 <td style="text-align: right;">
+                                    <% 
+                                        long sellerNow = System.currentTimeMillis();
+                                        boolean isSellerClosed = (a.getEndTime() != null && sellerNow >= a.getEndTime().getTime()) || "COMPLETED".equalsIgnoreCase(a.getStatus());
+                                        if (isSellerClosed && a.getBidCount() > 0) { 
+                                    %>
+                                        <a href="certificate?auctionId=<%= a.getAuctionId() %>" class="action-link" style="background: #0f172a; border-color: #0f172a; color: white; margin-right: 6px;">
+                                            Sale Record
+                                        </a>
+                                    <% } %>
                                     <a href="bid.jsp?auctionId=<%= a.getAuctionId() %>" class="action-link secondary">
                                         View Details →
                                     </a>

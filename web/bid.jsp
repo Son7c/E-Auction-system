@@ -901,6 +901,19 @@
                                 <div style="font-size: 13px; color: #475569;">
                                     Final Winning Bid: <strong style="color: #1765e8; font-size: 16px;">₹<%= String.format("%,.2f", winner.getBidAmount()) %></strong>
                                 </div>
+                                <% if (isWinnerUser) { %>
+                                    <div style="margin-top: 12px;">
+                                        <a href="certificate?auctionId=<%= auctionId %>" class="auth-prompt-btn" style="background: #10b981; color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; width: 100%; box-sizing: border-box; box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);">
+                                            View Certificate
+                                        </a>
+                                    </div>
+                                <% } else if (isSeller) { %>
+                                    <div style="margin-top: 12px;">
+                                        <a href="certificate?auctionId=<%= auctionId %>" class="auth-prompt-btn" style="background: #0f172a; color: #fff; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-weight: 700; width: 100%; box-sizing: border-box;">
+                                            View Sale Record
+                                        </a>
+                                    </div>
+                                <% } %>
                             </div>
                         <% } else { %>
                             <div class="alert alert-info">
