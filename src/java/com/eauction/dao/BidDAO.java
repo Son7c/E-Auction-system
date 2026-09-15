@@ -129,7 +129,7 @@ public class BidDAO {
         List<com.eauction.form.UserBidSummary> list = new ArrayList<>();
         String sql = """
             SELECT a.AUCTION_ID, i.NAME, i.CATEGORY, i.IMAGE_URL,
-                   a.STARTING_BID, a.HIGHEST_BID, a.START_TIME, a.END_TIME, a.STATUS,
+                   a.STARTING_BID, a.HIGHEST_BID, a.START_TIME, a.END_TIME,
                    MAX(b.BID_AMOUNT) AS USER_MAX_BID,
                    COUNT(b.BID_ID) AS USER_BID_COUNT
             FROM AUCTIONS a
@@ -137,7 +137,7 @@ public class BidDAO {
             JOIN BIDS b ON a.AUCTION_ID = b.AUCTION_ID
             WHERE b.BIDDER_ID = ?
             GROUP BY a.AUCTION_ID, i.NAME, i.CATEGORY, i.IMAGE_URL,
-                     a.STARTING_BID, a.HIGHEST_BID, a.START_TIME, a.END_TIME, a.STATUS
+                     a.STARTING_BID, a.HIGHEST_BID, a.START_TIME, a.END_TIME
             ORDER BY a.AUCTION_ID DESC
             """;
         try (Connection con = DBConnection.getConnection();
@@ -154,7 +154,6 @@ public class BidDAO {
                     s.setCurrentHighestBid(rs.getDouble("HIGHEST_BID"));
                     s.setStartTime(rs.getTimestamp("START_TIME"));
                     s.setEndTime(rs.getTimestamp("END_TIME"));
-                    s.setStatus(rs.getString("STATUS"));
                     s.setUserHighestBid(rs.getDouble("USER_MAX_BID"));
                     s.setUserBidCount(rs.getInt("USER_BID_COUNT"));
                     list.add(s);

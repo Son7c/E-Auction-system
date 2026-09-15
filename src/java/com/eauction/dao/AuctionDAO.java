@@ -39,7 +39,7 @@ public class AuctionDAO {
         List<AuctionForm> auctions = new ArrayList<>();
         String sql = """
             SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
-                   a.START_TIME, a.END_TIME, a.STATUS,
+                   a.START_TIME, a.END_TIME,
                    i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL,
                    u.NAME AS SELLER_NAME
             FROM AUCTIONS a
@@ -60,7 +60,6 @@ public class AuctionDAO {
                 auction.setHighestBid(rs.getDouble("HIGHEST_BID"));
                 auction.setStartTime(rs.getTimestamp("START_TIME"));
                 auction.setEndTime(rs.getTimestamp("END_TIME"));
-                auction.setStatus(rs.getString("STATUS"));
 
                 auction.setSellerId(rs.getInt("SELLER_ID"));
                 auction.setName(rs.getString("NAME"));
@@ -82,7 +81,7 @@ public class AuctionDAO {
     public AuctionForm getAuctionById(int auctionId) {
         String sql = """
             SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
-                   a.START_TIME, a.END_TIME, a.STATUS,
+                   a.START_TIME, a.END_TIME,
                    i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL,
                    u.NAME AS SELLER_NAME
             FROM AUCTIONS a
@@ -105,7 +104,6 @@ public class AuctionDAO {
                     auction.setHighestBid(rs.getDouble("HIGHEST_BID"));
                     auction.setStartTime(rs.getTimestamp("START_TIME"));
                     auction.setEndTime(rs.getTimestamp("END_TIME"));
-                    auction.setStatus(rs.getString("STATUS"));
 
                     auction.setSellerId(rs.getInt("SELLER_ID"));
                     auction.setName(rs.getString("NAME"));
@@ -128,7 +126,7 @@ public class AuctionDAO {
         List<AuctionForm> list = new ArrayList<>();
         String sql = """
             SELECT a.AUCTION_ID, a.ITEM_ID, a.STARTING_BID, a.HIGHEST_BID,
-                   a.START_TIME, a.END_TIME, a.STATUS,
+                   a.START_TIME, a.END_TIME,
                    i.SELLER_ID, i.NAME, i.DESCRIPTION, i.CATEGORY, i.IMAGE_URL,
                    u.NAME AS SELLER_NAME,
                    (SELECT COUNT(*) FROM BIDS b WHERE b.AUCTION_ID = a.AUCTION_ID) AS BID_COUNT
@@ -152,7 +150,6 @@ public class AuctionDAO {
                     auction.setHighestBid(rs.getDouble("HIGHEST_BID"));
                     auction.setStartTime(rs.getTimestamp("START_TIME"));
                     auction.setEndTime(rs.getTimestamp("END_TIME"));
-                    auction.setStatus(rs.getString("STATUS"));
 
                     auction.setSellerId(rs.getInt("SELLER_ID"));
                     auction.setName(rs.getString("NAME"));
