@@ -14,6 +14,9 @@
 # OS files
 .DS_Store
 Thumbs.db
+*~
+*.swp
+*.bak
 
 # Logs
 *.log

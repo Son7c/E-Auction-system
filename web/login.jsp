@@ -584,6 +584,12 @@
                 alertBox.style.color = "#b91c1c";
                 alertBox.style.border = "1px solid #fecaca";
                 alertBox.textContent = "Invalid email or password. Please try again.";
+            } else if (urlParams.get("error") === "unauthorized") {
+                alertBox.style.display = "block";
+                alertBox.style.background = "#fee2e2";
+                alertBox.style.color = "#b91c1c";
+                alertBox.style.border = "1px solid #fecaca";
+                alertBox.textContent = "Admin authorization required to access that area.";
             }
         });
 

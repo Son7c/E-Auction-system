@@ -25,7 +25,19 @@ public class AuctionServlet extends HttpServlet {
         response.setContentType("application/json;charset=UTF-8");
 
         AuctionService auctionService = new AuctionService();
-        List<AuctionForm> auctions = auctionService.getAllAuctions();
+
+        HttpSession session = request.getSession(false);
+        UserForm user = (session != null && session.getAttribute("user") instanceof UserForm)
+                ? (UserForm) session.getAttribute("user") : null;
+        boolean isAdmin = com.eauction.util.AdminConfig.isAdmin(user);
+
+        String scope = request.getParameter("scope");
+        List<AuctionForm> auctions;
+        if ("all".equalsIgnoreCase(scope) && isAdmin) {
+            auctions = auctionService.getAllAuctions();
+        } else {
+            auctions = auctionService.getApprovedAuctions();
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("[");
@@ -68,12 +80,23 @@ public class AuctionServlet extends HttpServlet {
                            .replace("\t", "\\t") + "\"";
     }
 
+    private Timestamp parseTimestamp(String input) {
+        if (input == null || input.trim().isEmpty()) {
+            return null;
+        }
+        String clean = input.trim().replace("T", " ");
+        if (clean.length() == 16) {
+            clean += ":00";
+        }
+        return Timestamp.valueOf(clean);
+    }
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        //Check session
+        // Check session
         HttpSession session = request.getSession(false);
 
         if (session == null || session.getAttribute("user") == null) {
@@ -81,52 +104,82 @@ public class AuctionServlet extends HttpServlet {
             return;
         }
 
-        UserForm user
-                = (UserForm) session.getAttribute("user");
+        UserForm user = (UserForm) session.getAttribute("user");
 
-        // 3. Create ItemForm
-        ItemForm item = new ItemForm();
+        // Ensure user has valid ID from database
+        int sellerId = user.getUserId();
+        if (sellerId <= 0 && user.getEmail() != null) {
+            com.eauction.dao.UserDAO userDAO = new com.eauction.dao.UserDAO();
+            UserForm dbUser = userDAO.getUserByEmail(user.getEmail());
+            if (dbUser != null) {
+                sellerId = dbUser.getUserId();
+                user.setUserId(sellerId);
+                session.setAttribute("user", user);
+            }
+        }
 
-        item.setSellerId(user.getUserId());
-        item.setName(request.getParameter("name"));
-        item.setDescription(request.getParameter("description"));
-        item.setCategory(request.getParameter("category"));
-        item.setImageUrl(request.getParameter("imageUrl"));
+        if (sellerId <= 0) {
+            response.sendRedirect("create-auction.jsp?error=invalid_user");
+            return;
+        }
 
-        // 4. Create AuctionForm
-        AuctionForm auction = new AuctionForm();
+        try {
+            // 3. Create ItemForm
+            ItemForm item = new ItemForm();
+            item.setSellerId(sellerId);
+            item.setName(request.getParameter("name"));
+            item.setDescription(request.getParameter("description"));
+            item.setCategory(request.getParameter("category"));
+            item.setImageUrl(request.getParameter("imageUrl"));
 
-        auction.setStartingBid(
-                Double.parseDouble(
-                        request.getParameter("startingBid")
-                )
-        );
+            // 4. Create AuctionForm
+            AuctionForm auction = new AuctionForm();
 
-        auction.setStartTime(
-                Timestamp.valueOf(
-                        request.getParameter("startTime").replace("T", " ") + ":00"
-                )
-        );
+            String startingBidParam = request.getParameter("startingBid");
+            if (startingBidParam == null || startingBidParam.trim().isEmpty()) {
+                response.sendRedirect("create-auction.jsp?error=price");
+                return;
+            }
+            auction.setStartingBid(Double.parseDouble(startingBidParam.trim()));
 
-        auction.setEndTime(
-                Timestamp.valueOf(
-                        request.getParameter("endTime").replace("T", " ") + ":00"
-                )
-        );
+            Timestamp startTime = parseTimestamp(request.getParameter("startTime"));
+            Timestamp endTime = parseTimestamp(request.getParameter("endTime"));
 
-        AuctionService auctionService
-                = new AuctionService();
+            if (startTime == null || endTime == null) {
+                response.sendRedirect("create-auction.jsp?error=date");
+                return;
+            }
 
-        boolean success
-                = auctionService.createItemWithAuction(
-                        item,
-                        auction
-                );
+            auction.setStartTime(startTime);
+            auction.setEndTime(endTime);
 
-        if (success) {
-            response.sendRedirect("bidding.jsp?created=success");
-        } else {
-            response.sendRedirect("create-auction.jsp?error=failed");
+            // Every new auction listing starts with PENDING status for moderation
+            auction.setStatus("PENDING");
+
+            AuctionService auctionService = new AuctionService();
+            boolean success = auctionService.createItemWithAuction(item, auction);
+
+            boolean userIsAdmin = com.eauction.util.AdminConfig.isAdmin(user);
+
+            if (success) {
+                if (userIsAdmin) {
+                    response.sendRedirect("admin-dashboard.jsp?action=created&status=PENDING");
+                } else {
+                    response.sendRedirect("dashboard.jsp?listing=pending");
+                }
+            } else {
+                response.sendRedirect("create-auction.jsp?error=failed");
+            }
+        } catch (NumberFormatException e) {
+            System.err.println("AuctionServlet NumberFormatException: " + e.getMessage());
+            response.sendRedirect("create-auction.jsp?error=price");
+        } catch (IllegalArgumentException e) {
+            System.err.println("AuctionServlet IllegalArgumentException: " + e.getMessage());
+            response.sendRedirect("create-auction.jsp?error=date");
+        } catch (Exception e) {
+            System.err.println("AuctionServlet unexpected error: " + e.getMessage());
+            e.printStackTrace();
+            response.sendRedirect("create-auction.jsp?error=" + java.net.URLEncoder.encode(e.getMessage() != null ? e.getMessage() : "failed", "UTF-8"));
         }
     }
 }

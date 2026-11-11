@@ -38,6 +38,23 @@ public class LoginServlet extends HttpServlet {
 
         UserForm user = (loginForm.getEmail() != null) ? userDAO.getUserByEmail(loginForm.getEmail()) : null;
 
+        // Auto-provision default admin account if logging in as admin for the first time
+        if (user == null && loginForm.getEmail() != null
+                && com.eauction.util.AdminConfig.getAdminEmail().equalsIgnoreCase(loginForm.getEmail().trim())
+                && "admin123".equals(loginForm.getPassword())) {
+            UserForm autoAdmin = new UserForm();
+            autoAdmin.setEmail(com.eauction.util.AdminConfig.getAdminEmail());
+            autoAdmin.setName("System Admin");
+            autoAdmin.setPassword("admin123");
+            autoAdmin.setPhoneNo("9999999999");
+            autoAdmin.setAddress(com.eauction.util.AdminConfig.getAdminAddress());
+            autoAdmin.setSecurityQuestion("What is your role?");
+            autoAdmin.setSecurityAnswer("Admin");
+            if (userDAO.registerUser(autoAdmin)) {
+                user = userDAO.getUserByEmail(com.eauction.util.AdminConfig.getAdminEmail());
+            }
+        }
+
         // 4. Verify password
         if (user != null &&
                 loginForm.getPassword() != null &&
@@ -45,11 +62,18 @@ public class LoginServlet extends HttpServlet {
                         loginForm.getPassword(),
                         user.getPassword())) {
 
-            // 5. Create session & redirect to homepage
+            // 5. Create session & check Admin mode
             HttpSession session = request.getSession();
             session.setAttribute("user", user);
 
-            response.sendRedirect("homepage.jsp");
+            boolean isAdmin = com.eauction.util.AdminConfig.isAdmin(user);
+            session.setAttribute("isAdmin", isAdmin);
+
+            if (isAdmin) {
+                response.sendRedirect("admin-dashboard.jsp");
+            } else {
+                response.sendRedirect("homepage.jsp");
+            }
 
         } else {
             // Redirect back with error query parameter

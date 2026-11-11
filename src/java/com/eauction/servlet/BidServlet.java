@@ -46,6 +46,14 @@ public class BidServlet extends HttpServlet {
 
         UserForm user = (UserForm) session.getAttribute("user");
 
+        com.eauction.service.AuctionService auctionService = new com.eauction.service.AuctionService();
+        com.eauction.form.AuctionForm auction = auctionService.getAuctionById(auctionId);
+        if (auction == null || !auction.isApproved()) {
+            String errorMsg = URLEncoder.encode("This auction is not active for bidding.", StandardCharsets.UTF_8);
+            response.sendRedirect("bid.jsp?auctionId=" + auctionId + "&error=" + errorMsg);
+            return;
+        }
+
         String bidAmountStr = request.getParameter("bidAmount");
         if (bidAmountStr == null || bidAmountStr.trim().isEmpty()) {
             String errorMsg = URLEncoder.encode("Please enter a valid bid amount.", StandardCharsets.UTF_8);

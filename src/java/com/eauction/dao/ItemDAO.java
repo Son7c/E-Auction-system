@@ -13,17 +13,10 @@ public class ItemDAO {
 
     public int createItem(ItemForm item, Connection con) {
 
-        String sql = """
-            INSERT INTO ITEMS
-            (SELLER_ID, NAME, DESCRIPTION, CATEGORY, IMAGE_URL)
-            VALUES (?, ?, ?, ?, ?)
-            """;
+        // Oracle 12c+ IDENTITY columns: no triggers, internal ISEQ$$_xxxxx sequences
+        String sql = "INSERT INTO ITEMS (SELLER_ID, NAME, DESCRIPTION, CATEGORY, IMAGE_URL) VALUES (?, ?, ?, ?, ?)";
 
-        try (
-                PreparedStatement ps = con.prepareStatement(
-                        sql,
-                        new String[]{"ITEM_ID"})) {
-
+        try (PreparedStatement ps = con.prepareStatement(sql, new String[]{"ITEM_ID"})) {
             ps.setInt(1, item.getSellerId());
             ps.setString(2, item.getName());
             ps.setString(3, item.getDescription());
@@ -31,23 +24,78 @@ public class ItemDAO {
             ps.setString(5, item.getImageUrl());
 
             int rows = ps.executeUpdate();
-
             if (rows == 0) {
+                System.err.println("ItemDAO.createItem: executeUpdate returned 0 rows");
                 return -1;
             }
 
+            // Strategy 1: getGeneratedKeys (may work with Oracle JDBC 21+ for identity columns)
             try (ResultSet rs = ps.getGeneratedKeys()) {
-
-                if (rs.next()) {
-                    return rs.getInt(1);
+                if (rs != null && rs.next()) {
+                    int id = rs.getInt(1);
+                    if (id > 0) {
+                        System.out.println("ItemDAO.createItem: ITEM_ID=" + id + " via getGeneratedKeys");
+                        return id;
+                    }
                 }
+            } catch (Exception ex) {
+                System.err.println("ItemDAO.createItem: getGeneratedKeys: " + ex.getMessage());
             }
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+            // Strategy 2: Look up the actual Oracle IDENTITY sequence for ITEM_ID via USER_TAB_IDENTITY_COLS
+            // This finds the internal ISEQ$$_xxxxx sequence name and queries its CURRVAL
+            try (PreparedStatement psMeta = con.prepareStatement(
+                    "SELECT SEQUENCE_NAME FROM USER_TAB_IDENTITY_COLS " +
+                    "WHERE TABLE_NAME = 'ITEMS' AND COLUMN_NAME = 'ITEM_ID'")) {
+                try (ResultSet rsMeta = psMeta.executeQuery()) {
+                    if (rsMeta.next()) {
+                        String seqName = rsMeta.getString(1);
+                        if (seqName != null && !seqName.isEmpty()) {
+                            System.out.println("ItemDAO.createItem: identity sequence = " + seqName);
+                            try (java.sql.Statement stCurr = con.createStatement();
+                                 ResultSet rsCurr = stCurr.executeQuery("SELECT \"" + seqName + "\".CURRVAL FROM DUAL")) {
+                                if (rsCurr.next()) {
+                                    int id = rsCurr.getInt(1);
+                                    if (id > 0) {
+                                        System.out.println("ItemDAO.createItem: ITEM_ID=" + id + " via " + seqName + ".CURRVAL");
+                                        return id;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            } catch (Exception ex) {
+                System.err.println("ItemDAO.createItem: identity seq lookup failed: " + ex.getMessage());
+            }
 
-        return -1;
+            // Strategy 3: MAX(ITEM_ID) for this seller + name on the same connection
+            // Works in Oracle because same-session uncommitted rows are visible
+            try (PreparedStatement psMax = con.prepareStatement(
+                    "SELECT MAX(ITEM_ID) FROM ITEMS WHERE SELLER_ID = ? AND NAME = ?")) {
+                psMax.setInt(1, item.getSellerId());
+                psMax.setString(2, item.getName());
+                try (ResultSet rsMax = psMax.executeQuery()) {
+                    if (rsMax.next()) {
+                        int id = rsMax.getInt(1);
+                        if (id > 0) {
+                            System.out.println("ItemDAO.createItem: ITEM_ID=" + id + " via MAX(ITEM_ID) fallback");
+                            return id;
+                        }
+                    }
+                }
+            } catch (Exception ex2) {
+                System.err.println("ItemDAO.createItem: MAX fallback failed: " + ex2.getMessage());
+            }
+
+            System.err.println("ItemDAO.createItem: INSERT succeeded but could not retrieve ITEM_ID!");
+            return -1;
+
+        } catch (SQLException e) {
+            System.err.println("ItemDAO.createItem SQL ERROR: " + e.getMessage());
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     public boolean createItem(ItemForm item) {

@@ -36,15 +36,23 @@
         loggedInUser = (UserForm) session.getAttribute("user");
     }
 
+    boolean isAdmin = com.eauction.util.AdminConfig.isAdmin(loggedInUser);
+    boolean isSeller = loggedInUser != null && loggedInUser.getUserId() == auction.getSellerId();
+
+    if (!auction.isApproved() && !isAdmin && !isSeller) {
+        response.sendRedirect("bidding.jsp?error=not_approved");
+        return;
+    }
+
     long now = System.currentTimeMillis();
     long startTime = auction.getStartTime() != null ? auction.getStartTime().getTime() : 0;
     long endTime = auction.getEndTime() != null ? auction.getEndTime().getTime() : Long.MAX_VALUE;
 
-    boolean isUpcoming = now < startTime;
-    boolean isClosed = now > endTime;
-    boolean isLive = !isUpcoming && !isClosed;
-
-    boolean isSeller = loggedInUser != null && loggedInUser.getUserId() == auction.getSellerId();
+    boolean isPending = auction.isPending();
+    boolean isRejected = auction.isRejected();
+    boolean isUpcoming = !isPending && !isRejected && now < startTime;
+    boolean isClosed = !isPending && !isRejected && now > endTime;
+    boolean isLive = !isPending && !isRejected && !isUpcoming && !isClosed;
 
     double currentPrice = (auction.getHighestBid() > 0) ? auction.getHighestBid() : auction.getStartingBid();
     double minNextBid = (auction.getHighestBid() > 0) ? (auction.getHighestBid() + 1.0) : auction.getStartingBid();
@@ -781,7 +789,11 @@
                         <% } %>
 
                         <!-- STATUS PILL -->
-                        <% if (isLive) { %>
+                        <% if (isPending) { %>
+                            <span class="status-pill" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">⏳ Pending Approval</span>
+                        <% } else if (isRejected) { %>
+                            <span class="status-pill" style="background: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;">❌ Rejected</span>
+                        <% } else if (isLive) { %>
                             <span class="status-pill badge-active">● Live Auction</span>
                         <% } else if (isUpcoming) { %>
                             <span class="status-pill badge-upcoming">⏱ Starts Soon</span>
@@ -879,7 +891,33 @@
                     <% } %>
 
                     <!-- BID PLACEMENT FORM / GUEST ACTIONS -->
-                    <% if (isClosed) { %>
+                    <% if (isPending) { %>
+                        <div class="alert alert-info" style="background: #fffbeb; color: #b45309; border: 1px solid #fde68a;">
+                            ⏳ <strong>Listing Pending Admin Confirmation:</strong> This auction is currently awaiting administrator review. Bidding is not open until approved.
+                        </div>
+                        <% if (isAdmin) { %>
+                            <div style="display: flex; gap: 10px; margin-top: 14px; margin-bottom: 14px;">
+                                <form action="moderateAuction" method="post" style="flex: 1;">
+                                    <input type="hidden" name="auctionId" value="<%= auction.getAuctionId() %>">
+                                    <input type="hidden" name="action" value="approve">
+                                    <button type="submit" class="place-bid-btn" style="background: #10b981; margin: 0;">
+                                        ✅ Confirm & List Auction
+                                    </button>
+                                </form>
+                                <form action="moderateAuction" method="post" style="flex: 1;">
+                                    <input type="hidden" name="auctionId" value="<%= auction.getAuctionId() %>">
+                                    <input type="hidden" name="action" value="reject">
+                                    <button type="submit" class="place-bid-btn" style="background: #ef4444; margin: 0;">
+                                        ❌ Reject Listing
+                                    </button>
+                                </form>
+                            </div>
+                        <% } %>
+                    <% } else if (isRejected) { %>
+                        <div class="alert alert-error">
+                            ❌ <strong>Listing Rejected:</strong> This auction listing has been rejected by an Administrator and cannot accept bids.
+                        </div>
+                    <% } else if (isClosed) { %>
                         <div class="alert alert-error">
                             🔒 This auction has officially closed. No further bids can be accepted.
                         </div>

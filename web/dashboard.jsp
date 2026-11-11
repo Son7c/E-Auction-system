@@ -584,6 +584,16 @@
     <!-- ================= MAIN ================= -->
     <main class="page">
 
+        <% if ("pending".equals(request.getParameter("listing"))) { %>
+            <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; padding: 16px 20px; margin-bottom: 24px; display: flex; align-items: center; gap: 14px; box-shadow: 0 2px 8px rgba(16, 185, 129, 0.08);">
+                <div style="font-size: 24px;">⏳</div>
+                <div>
+                    <strong style="color: #065f46; font-size: 15px; display: block; margin-bottom: 2px;">Listing Created & Awaiting Admin Approval!</strong>
+                    <span style="color: #047857; font-size: 13px;">Your auction listing has been submitted successfully. An administrator must confirm and approve your listing before it is published to the public marketplace.</span>
+                </div>
+            </div>
+        <% } %>
+
         <!-- PROFILE BANNER -->
         <div class="profile-banner">
             <div class="profile-user-info">
@@ -772,7 +782,13 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <% if (aLive) { %>
+                                    <% if (a.isPending()) { %>
+                                        <span class="badge" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">⏳ Pending Approval</span>
+                                    <% } else if (a.isRejected()) { %>
+                                        <span class="badge badge-outbid">❌ Rejected</span>
+                                    <% } else if (a.isCompleted()) { %>
+                                        <span class="badge badge-closed">🏁 Completed</span>
+                                    <% } else if (aLive) { %>
                                         <span class="badge badge-live">● Live</span>
                                     <% } else if (aUpcoming) { %>
                                         <span class="badge badge-upcoming">⏱ Upcoming</span>

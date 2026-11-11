@@ -87,6 +87,43 @@ public class AuctionForm {
         this.status = status;
     }
 
+    public boolean isPending() {
+        return status == null || "PENDING".equalsIgnoreCase(status.trim());
+    }
+
+    public boolean isCompleted() {
+        if (status != null && "COMPLETED".equalsIgnoreCase(status.trim())) {
+            return true;
+        }
+        if (endTime != null && System.currentTimeMillis() >= endTime.getTime() && !isPending() && !isRejected()) {
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isApproved() {
+        if (isCompleted() || isRejected() || isPending()) {
+            return false;
+        }
+        return status != null && ("APPROVED".equalsIgnoreCase(status.trim()) || "ACTIVE".equalsIgnoreCase(status.trim()));
+    }
+
+    public boolean isRejected() {
+        return status != null && "REJECTED".equalsIgnoreCase(status.trim());
+    }
+
+    public String getStatusLabel() {
+        if (isCompleted()) {
+            return "Completed";
+        } else if (isRejected()) {
+            return "Rejected";
+        } else if (isApproved()) {
+            return "Approved";
+        } else {
+            return "Pending Approval";
+        }
+    }
+
     public int getSellerId() {
         return sellerId;
     }

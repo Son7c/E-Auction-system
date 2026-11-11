@@ -901,6 +901,19 @@
             <!-- ALERT NOTIFICATION -->
             <div id="alertMessage" style="display: none; padding: 12px; border-radius: 8px; font-size: 14px; margin-bottom: 20px; text-align: center;"></div>
 
+            <% boolean isUserAdmin = com.eauction.util.AdminConfig.isAdmin(loggedInUser); %>
+            <% if (!isUserAdmin) { %>
+                <div style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #1e40af;">
+                    <span style="font-size: 18px;">🛡️</span>
+                    <span><strong>Admin Moderation Notice:</strong> Newly created listings are saved as <strong>PENDING</strong> and must be confirmed by an Administrator before appearing publicly.</span>
+                </div>
+            <% } else { %>
+                <div style="background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; font-size: 13px; color: #065f46;">
+                    <span style="font-size: 18px;">🛡️</span>
+                    <span><strong>Admin Control Active:</strong> This listing will be initialized as <strong>PENDING</strong> and submitted to the Moderation Queue for your review.</span>
+                </div>
+            <% } %>
+
             <form
                 id="auctionForm"
                 action="createAuction"
@@ -1420,12 +1433,23 @@
         window.addEventListener("DOMContentLoaded", () => {
             const urlParams = new URLSearchParams(window.location.search);
             const alertBox = document.getElementById("alertMessage");
-            if (alertBox && urlParams.get("error") === "failed") {
+            if (alertBox && urlParams.get("error")) {
+                const err = urlParams.get("error");
                 alertBox.style.display = "block";
                 alertBox.style.background = "#fee2e2";
                 alertBox.style.color = "#b91c1c";
                 alertBox.style.border = "1px solid #fecaca";
-                alertBox.textContent = "Failed to create auction. Please try again.";
+                if (err === "invalid_user") {
+                    alertBox.textContent = "Error: Invalid user session. Please re-login.";
+                } else if (err === "date") {
+                    alertBox.textContent = "Error: Invalid date format. Please check auction start/end times.";
+                } else if (err === "price") {
+                    alertBox.textContent = "Error: Starting bid must be a valid positive number.";
+                } else if (err !== "failed") {
+                    alertBox.textContent = "Error: " + decodeURIComponent(err);
+                } else {
+                    alertBox.textContent = "Failed to create auction. Please check server logs or database constraints.";
+                }
             }
         });
 
